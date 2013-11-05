@@ -1,3 +1,5 @@
+package paxos;
+
 public class ProcessId implements Comparable {
 	String name;
 

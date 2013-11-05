@@ -1,3 +1,5 @@
+package paxos;
+
 public class Command {
 	ProcessId client;
 	int req_id;

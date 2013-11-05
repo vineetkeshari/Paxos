@@ -1,3 +1,5 @@
+package paxos;
+
 public abstract class Process extends Thread {
 	ProcessId me;
 	Queue<PaxosMessage> inbox = new Queue<PaxosMessage>();

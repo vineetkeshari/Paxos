@@ -1,3 +1,5 @@
+package paxos;
+
 import java.util.*;
 
 public class PaxosMessage {
