@@ -1,11 +1,13 @@
 package paxos;
 
+import bank.operations.Operation;
+
 public class Command {
 	ProcessId client;
 	int req_id;
-	Object op;
+	Operation op;
 
-	public Command(ProcessId client, int req_id, Object op){
+	public Command(ProcessId client, int req_id, Operation op){
 		this.client = client;
 		this.req_id = req_id;
 		this.op = op;

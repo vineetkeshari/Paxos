@@ -1,5 +1,7 @@
 package paxos;
 
+import bank.operations.DepositOperation;
+
 import java.util.*;
 
 public class Env {
@@ -44,7 +46,7 @@ public class Env {
 			ProcessId pid = new ProcessId("client:" + i);
 			for (int r = 0; r < nReplicas; r++) {
 				sendMessage(replicas[r],
-					new RequestMessage(pid, new Command(pid, 0, "operation " + i)));
+					new RequestMessage(pid, new Command(pid, 0, new DepositOperation(1,1))));
 			}
 		}
 	}

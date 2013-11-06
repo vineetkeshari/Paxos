@@ -1,10 +1,12 @@
 package paxos;
 
 import java.util.*;
+import bank.BankState;
 
 public class Replica extends Process {
 	ProcessId[] leaders;
 	int slot_num = 1;
+	BankState bank = new BankState(); 
 	Map<Integer /* slot number */, Command> proposals = new HashMap<Integer, Command>();
 	Map<Integer /* slot number */, Command> decisions = new HashMap<Integer, Command>();
 
