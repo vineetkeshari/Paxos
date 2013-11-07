@@ -38,7 +38,8 @@ public class Replica extends Process {
 				return;
 			}
 		}
-		System.out.println("" + me + ": perform " + c);
+		System.out.println("Replica " + me + ": perform " + c);
+		c.op.perform(bank);
 		slot_num++;
 	}
 

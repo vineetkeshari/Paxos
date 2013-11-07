@@ -1,12 +1,14 @@
 package paxos;
 
-import bank.operations.DepositOperation;
+import bank.operations.Operation;
 
 import java.util.*;
 
+import util.OperationReader;
+
 public class Env {
 	Map<ProcessId, Process> procs = new HashMap<ProcessId, Process>();
-	public final static int nAcceptors = 3, nReplicas = 2, nLeaders = 2, nRequests = 10;
+	public final static int nAcceptors = 3, nReplicas = 3, nLeaders = 2;
 
 	synchronized void sendMessage(ProcessId dst, PaxosMessage msg){
 		Process p = procs.get(dst);
@@ -25,6 +27,11 @@ public class Env {
 	}
 
 	void run(String[] args){
+	    if (args.length != 1) {
+	        System.out.println("Please provide one filename");
+	        System.exit(0);
+	    }
+	    
 		ProcessId[] acceptors = new ProcessId[nAcceptors];
 		ProcessId[] replicas = new ProcessId[nReplicas];
 		ProcessId[] leaders = new ProcessId[nLeaders];
@@ -41,13 +48,15 @@ public class Env {
 			leaders[i] = new ProcessId("leader:" + i);
 			Leader leader = new Leader(this, leaders[i], acceptors, replicas);
 		}
-
-		for (int i = 1; i < nRequests; i++) {
-			ProcessId pid = new ProcessId("client:" + i);
+		
+		OperationReader reader = new OperationReader(args[0]);
+		Operation operation = reader.getOperation();;
+		for (int i=1; operation != null; ++i) {
+			ProcessId pid = new ProcessId("Client operation: " + i);
 			for (int r = 0; r < nReplicas; r++) {
-				sendMessage(replicas[r],
-					new RequestMessage(pid, new Command(pid, 0, new DepositOperation(1,1))));
+				sendMessage(replicas[r], new RequestMessage(pid, new Command(pid, 0, operation)));
 			}
+			operation = reader.getOperation();
 		}
 	}
 

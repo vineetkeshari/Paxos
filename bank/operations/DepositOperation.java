@@ -6,7 +6,8 @@ public class DepositOperation extends Operation {
     int account;
     double amount;
     
-    public DepositOperation (int account, double amount) {
+    public DepositOperation (int account, double amount, String text) {
+        super(text);
         this.amount = amount;
         this.account = account;
     }
