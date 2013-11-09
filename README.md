@@ -1,4 +1,4 @@
 Paxos
 =====
 
-Paxos made live for CS 380D Distributed Computing
+Paxos made moderately complex for CS 380D Distributed Computing. Bank application built on top.
