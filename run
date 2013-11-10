@@ -1,0 +1,7 @@
+#!/bin/sh
+
+find . -name "*.log" | xargs rm;
+find . -name "*.class" | xargs rm;
+find . -name "*.java" | xargs javac;
+java paxos/Env input/$1
+

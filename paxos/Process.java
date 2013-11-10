@@ -1,6 +1,8 @@
 package paxos;
 
 public abstract class Process extends Thread {
+    private static final long DELAY = 100; // Miliseconds
+    
 	ProcessId me;
 	Queue<PaxosMessage> inbox = new Queue<PaxosMessage>();
 	Env env;
@@ -17,7 +19,13 @@ public abstract class Process extends Thread {
 	}
 
 	void sendMessage(ProcessId dst, PaxosMessage msg){
+	    //System.out.println("[" + System.nanoTime() + "]\tSEND\t" + me + "\t" + dst + "\t" + msg);
 		env.sendMessage(dst, msg);
+		try {
+		    Thread.sleep(DELAY);
+		} catch (InterruptedException e) {
+		    System.out.println("Delay failed!");
+		}
 	}
 
 	void deliver(PaxosMessage msg){

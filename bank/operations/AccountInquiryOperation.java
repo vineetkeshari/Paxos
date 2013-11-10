@@ -16,4 +16,9 @@ public class AccountInquiryOperation extends Operation {
     public void perform (BankState bank) {
         bank.inquiry(requestor, accountID);
     }
+    
+    @Override
+    public boolean ro() {
+        return true;
+    }
 }

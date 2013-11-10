@@ -11,6 +11,10 @@ public abstract class Operation {
     
     public abstract void perform (BankState bank);
     
+    public boolean ro () {
+        return false;
+    }
+    
     public String toString() {
         return text;
     }

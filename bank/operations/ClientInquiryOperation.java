@@ -14,4 +14,9 @@ public class ClientInquiryOperation extends Operation {
     public void perform (BankState bank) {
         bank.inquiry(requestor);
     }
+    
+    @Override
+    public boolean ro() {
+        return true;
+    }
 }

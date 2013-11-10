@@ -3,7 +3,7 @@ package paxos;
 import java.util.*;
 
 public class Leader extends Process {
-    final long BASE_TIMEOUT = 100; // Nano-seconds
+    final long BASE_TIMEOUT = 1000000000; // Nanoseconds
     long timeout = BASE_TIMEOUT;
     final double TIMEOUT_MULT = 1.1;
     final double TIMEOUT_NEG = BASE_TIMEOUT/100;

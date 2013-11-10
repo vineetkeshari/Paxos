@@ -1,5 +1,8 @@
 package bank;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -12,16 +15,27 @@ public class BankState {
     Map<Integer,Account> accounts;
     Set<Ownership> ownerships;
     ProcessId processId;
+    BufferedWriter logger;
     
     public BankState(ProcessId processId) {
         clients = new HashMap<Integer, Client>();
         accounts = new HashMap<Integer, Account>();
         ownerships = new HashSet<Ownership>();
         this.processId = processId;
+        try {
+            this.logger = new BufferedWriter (new FileWriter ("log/" + processId.toString() + ".log"));
+        } catch (IOException e) {
+            System.out.println("IOEXception!");
+        }
     }
     
     private void wrapPrint (String s) {
-        System.out.println("[" + processId + "]:\t" + s);
+        try {
+            logger.write(s + "\n");
+            logger.flush();
+        } catch (IOException e) {
+            System.out.println("IOEXception!");
+        }
     }
     
     public void createClient (String name, int id) {
@@ -73,33 +87,37 @@ public class BankState {
         }
     }
     
-    public void withdraw (int requestor, int account, double amount) {
+    public boolean withdraw (int requestor, int account, double amount) {
         if (accounts.containsKey(account)) {
             if (!clients.containsKey(requestor)) {
                 wrapPrint("Client " + requestor + " not found");
-                return;
+                return false;
             }
             if (!clients.get(requestor).getAccounts().contains(account)) {
                 wrapPrint("Client " + requestor + " does not own account " + account);
-                return;
+                return false;
             }
             wrapPrint("Withdrawing " + amount + " from account " + account);
-            accounts.get(account).removeBalance(amount);
+            if (accounts.get(account).removeBalance(amount))
+                return true;
+            else {
+                wrapPrint("Insufficient funds!");
+                return false;
+            }
         } else {
             wrapPrint("Account " + account + " not found!");
+            return false;
         }
     }
     
     public void transfer (int requestor, int accountFrom, int accountTo, double amount) {
         wrapPrint("Initiating transfer from " + accountFrom + " to " + accountTo);
-        double beforeAmount = accounts.get(accountFrom).getBalance();
         if (!accounts.containsKey(accountTo)) {
             wrapPrint("Account " + accountTo + " not found!");
         } else if (!accounts.containsKey(accountFrom)) {
             wrapPrint("Account " + accountFrom + " not found!");
         } else {
-            withdraw (requestor, accountFrom, amount);
-            if (accounts.get(accountFrom).getBalance() < beforeAmount)
+            if (withdraw (requestor, accountFrom, amount))
                 deposit (accountTo, amount);
         }
     }
@@ -168,11 +186,12 @@ public class BankState {
             balance += value;
         }
         
-        public void removeBalance(double value) {
-            if (balance >= value)
+        public boolean removeBalance(double value) {
+            if (balance >= value) {
                 balance -= value;
-            else
-                System.out.println("Insufficient funds!");
+                return true;
+            } else
+                return false;
         }
         
         public String toString() {
@@ -206,6 +225,14 @@ public class BankState {
         for (Ownership o : ownerships)
             sb.append(o.toString());
         return new String(sb);
+    }
+    
+    public void finalize() {
+        try {
+            logger.close();
+        } catch (IOException e) {
+            System.out.println("IOException!");
+        }
     }
 
 }
