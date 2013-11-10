@@ -3,12 +3,14 @@ package paxos;
 public class BallotNumber implements Comparable {
 	int round;
 	ProcessId leader_id;
+	long timeout;
 
-	public BallotNumber(int round, ProcessId leader_id){
+	public BallotNumber(int round, ProcessId leader_id, long timeout){
 		this.round = round;
 		this.leader_id = leader_id;
+		this.timeout = timeout;
 	}
-
+	
 	public boolean equals(Object other){
 		return compareTo(other) == 0;
 	}

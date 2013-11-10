@@ -6,7 +6,7 @@ import bank.BankState;
 public class Replica extends Process {
 	ProcessId[] leaders;
 	int slot_num = 1;
-	BankState bank = new BankState(); 
+	BankState bank; 
 	Map<Integer /* slot number */, Command> proposals = new HashMap<Integer, Command>();
 	Map<Integer /* slot number */, Command> decisions = new HashMap<Integer, Command>();
 
@@ -15,6 +15,7 @@ public class Replica extends Process {
 		this.me = me;
 		this.leaders = leaders;
 		env.addProc(me, this);
+		this.bank = new BankState (me);
 	}
 
 	void propose(Command c){
@@ -42,19 +43,6 @@ public class Replica extends Process {
 		c.op.perform(bank);
 		slot_num++;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	public void body(){
 		System.out.println("Here I am: " + me);

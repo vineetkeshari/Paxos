@@ -5,40 +5,48 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 
+import paxos.ProcessId;
+
 public class BankState {
     Map<Integer,Client> clients;
     Map<Integer,Account> accounts;
     Set<Ownership> ownerships;
+    ProcessId processId;
     
-    public BankState() {
+    public BankState(ProcessId processId) {
         clients = new HashMap<Integer, Client>();
         accounts = new HashMap<Integer, Account>();
         ownerships = new HashSet<Ownership>();
+        this.processId = processId;
+    }
+    
+    private void wrapPrint (String s) {
+        System.out.println("[" + processId + "]:\t" + s);
     }
     
     public void createClient (String name, int id) {
         if (clients.containsKey(id)) {
-            System.out.println ("Client ID " + id + " already exists");
+            wrapPrint ("Client ID " + id + " already exists");
         } else {
-            System.out.println("Creating client with ID " + id);
+            wrapPrint("Creating client with ID " + id);
             clients.put(id,new Client(id, name));
         }
     }
     
     public void createAccount (int id) {
         if (accounts.containsKey(id)) {
-            System.out.println ("Account ID " + id + " already exists");
+            wrapPrint ("Account ID " + id + " already exists");
         } else {
-            System.out.println("Creating account with ID " + id);
+            wrapPrint("Creating account with ID " + id);
             accounts.put(id, new Account(id));
         }
     }
     
     public void createAccount (int client, int id) {
         if (!clients.containsKey(client)) {
-            System.out.println("Client " + client + " not found");
+            wrapPrint("Client " + client + " not found");
         } else if (accounts.containsKey(id)) {
-            System.out.println ("Account ID " + id + " already exists");
+            wrapPrint ("Account ID " + id + " already exists");
         } else {
             createAccount(id);
             addAccount(client, id);
@@ -47,48 +55,48 @@ public class BankState {
     
     public void addAccount (int client, int account) {
         if (!clients.containsKey(client)) {
-            System.out.println("Client " + client + " not found");
+            wrapPrint("Client " + client + " not found");
         } else if (!accounts.containsKey(account)) {
-            System.out.println("Account " + account + " not found!");
+            wrapPrint("Account " + account + " not found!");
         } else {
-            System.out.println("Account " + account + " added to client " + client);
+            wrapPrint("Account " + account + " added to client " + client);
             ownerships.add(new Ownership(client, account));
         }
     }
     
     public void deposit (int account, double amount) {
         if (accounts.containsKey(account)) {
-            System.out.println("Adding " + amount + " to account " + account);
+            wrapPrint("Adding " + amount + " to account " + account);
             accounts.get(account).addBalance(amount);
         } else {
-            System.out.println("Account " + account + " not found!");
+            wrapPrint("Account " + account + " not found!");
         }
     }
     
     public void withdraw (int requestor, int account, double amount) {
         if (accounts.containsKey(account)) {
             if (!clients.containsKey(requestor)) {
-                System.out.println("Client " + requestor + " not found");
+                wrapPrint("Client " + requestor + " not found");
                 return;
             }
             if (!clients.get(requestor).getAccounts().contains(account)) {
-                System.out.println("Client " + requestor + " does not own account " + account);
+                wrapPrint("Client " + requestor + " does not own account " + account);
                 return;
             }
-            System.out.println("Withdrawing " + amount + " from account " + account);
+            wrapPrint("Withdrawing " + amount + " from account " + account);
             accounts.get(account).removeBalance(amount);
         } else {
-            System.out.println("Account " + account + " not found!");
+            wrapPrint("Account " + account + " not found!");
         }
     }
     
     public void transfer (int requestor, int accountFrom, int accountTo, double amount) {
-        System.out.println("Initiating transfer from " + accountFrom + " to " + accountTo);
+        wrapPrint("Initiating transfer from " + accountFrom + " to " + accountTo);
         double beforeAmount = accounts.get(accountFrom).getBalance();
         if (!accounts.containsKey(accountTo)) {
-            System.out.println("Account " + accountTo + " not found!");
+            wrapPrint("Account " + accountTo + " not found!");
         } else if (!accounts.containsKey(accountFrom)) {
-            System.out.println("Account " + accountFrom + " not found!");
+            wrapPrint("Account " + accountFrom + " not found!");
         } else {
             withdraw (requestor, accountFrom, amount);
             if (accounts.get(accountFrom).getBalance() < beforeAmount)
@@ -98,18 +106,18 @@ public class BankState {
     
     public void inquiry (int requestor, int account) {
         if (!clients.containsKey(requestor)) {
-            System.out.println("Client " + requestor + " not found");
+            wrapPrint("Client " + requestor + " not found");
         } else if (!accounts.containsKey(account)) {
-            System.out.println("Account " + account + " not found");
+            wrapPrint("Account " + account + " not found");
         } else if (!clients.get(requestor).getAccounts().contains(account)) {
-            System.out.println("Client " + requestor + " does not own account " + account);
+            wrapPrint("Client " + requestor + " does not own account " + account);
         } else
-            System.out.println ("Account balance for " + account + " is " + accounts.get(account).getBalance());
+            wrapPrint ("Account balance for " + account + " is " + accounts.get(account).getBalance());
     }
     
     public void inquiry (int requestor) {
         if (!clients.containsKey(requestor)) {
-            System.out.println("Client " + requestor + " not found");
+            wrapPrint("Client " + requestor + " not found");
         } else {
             Set<Integer> accounts = clients.get(requestor).getAccounts();
             for (Integer a : accounts)

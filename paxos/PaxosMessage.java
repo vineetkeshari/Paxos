@@ -52,3 +52,13 @@ class ProposeMessage extends PaxosMessage {
 	public ProposeMessage(ProcessId src, int slot_number, Command command){
 		this.src = src; this.slot_number = slot_number; this.command = command;
 }	}
+class PingMessage extends PaxosMessage {
+    public PingMessage(ProcessId src) {
+        this.src = src;
+}   }
+class PingResponseMessage extends PaxosMessage {
+    BallotNumber ballot_number;
+    public PingResponseMessage(ProcessId src, BallotNumber ballot_number) {
+        this.src = src;
+        this.ballot_number = ballot_number;
+}   }

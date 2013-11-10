@@ -8,7 +8,7 @@ import util.OperationReader;
 
 public class Env {
 	Map<ProcessId, Process> procs = new HashMap<ProcessId, Process>();
-	public final static int nAcceptors = 3, nReplicas = 3, nLeaders = 2;
+	public final static int nAcceptors = 10, nReplicas = 10, nLeaders = 10;
 
 	synchronized void sendMessage(ProcessId dst, PaxosMessage msg){
 		Process p = procs.get(dst);
