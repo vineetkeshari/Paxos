@@ -3,10 +3,10 @@ package paxos;
 import java.util.*;
 
 public class Leader extends Process {
-    final long BASE_TIMEOUT = 1000000000; // Nanoseconds
+    final long BASE_TIMEOUT = 1000; // Milliseconds
     long timeout = BASE_TIMEOUT;
     final double TIMEOUT_MULT = 1.1;
-    final double TIMEOUT_NEG = BASE_TIMEOUT/100;
+    final double TIMEOUT_NEG = BASE_TIMEOUT/100.0;
     
 	ProcessId[] acceptors;
 	ProcessId[] replicas;
@@ -40,7 +40,7 @@ public class Leader extends Process {
 	
 	private void waitFor (ProcessId otherLeader, int next_round, long ballot_timeout) {
         sendMessage (otherLeader, new PingMessage(me));
-        leaderTimeouts.put(otherLeader, System.nanoTime() + ballot_timeout);
+        leaderTimeouts.put(otherLeader, System.currentTimeMillis() + ballot_timeout);
         if (next_round > this.next_round) {
             this.next_round = next_round;
         }
@@ -54,7 +54,7 @@ public class Leader extends Process {
     }
     
     private boolean timeout(ProcessId p) {
-        if (System.nanoTime() > leaderTimeouts.get(p)) {
+        if (System.currentTimeMillis() > leaderTimeouts.get(p)) {
             leaderTimeouts.clear();
             advanceBallot();
             return true;
