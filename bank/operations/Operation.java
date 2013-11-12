@@ -15,6 +15,10 @@ public abstract class Operation {
         return false;
     }
     
+    public String text() {
+        return text;
+    }
+    
     public String toString() {
         return text;
     }

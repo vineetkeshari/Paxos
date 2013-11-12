@@ -36,6 +36,15 @@ public class Acceptor extends Process {
 				}
 				sendMessage(m.src, new P2bMessage(me, ballot_number, m.slot_number));
 			}
+            else if (msg instanceof P2aROMessage) {
+                P2aROMessage m = (P2aROMessage) msg;
+
+                if (ballot_number == null ||
+                        ballot_number.compareTo(m.ballot_number) <= 0) {
+                    ballot_number = m.ballot_number;
+                    accepted.add(new PValue(ballot_number, m.slot_number, m.command));
+                }
+            }
 		}
 	}
 }

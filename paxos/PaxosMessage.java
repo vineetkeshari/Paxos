@@ -22,6 +22,12 @@ class P2aMessage extends PaxosMessage {
 		this.src = src; this.ballot_number = ballot_number;
 		this.slot_number = slot_number; this.command = command;
 }	}
+class P2aROMessage extends PaxosMessage {
+    BallotNumber ballot_number; int slot_number; Command command;
+    P2aROMessage(ProcessId src, BallotNumber ballot_number, int slot_number, Command command){
+        this.src = src; this.ballot_number = ballot_number;
+        this.slot_number = slot_number; this.command = command;
+}   }
 class P2bMessage extends PaxosMessage {
 	BallotNumber ballot_number; int slot_number;
 	P2bMessage(ProcessId src, BallotNumber ballot_number, int slot_number){

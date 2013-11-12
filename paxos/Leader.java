@@ -2,13 +2,15 @@ package paxos;
 
 import java.util.*;
 
-public class Leader extends Process {
+public class Leader extends Process {    
+    int inMessageCount = 0;
+    final int FAIL_MESSAGE_COUNT = 100; // No. of paxos messages received before failure
+
     final double BASE_TIMEOUT = 100; // Milliseconds
     final double TIMEOUT_MULT = 1.1;
     final double TIMEOUT_NEG = BASE_TIMEOUT/100.0;
-    
     double timeout = BASE_TIMEOUT;
-    
+
 	ProcessId[] acceptors;
 	ProcessId[] replicas;
 	BallotNumber ballot_number;
@@ -74,6 +76,21 @@ public class Leader extends Process {
         new Scout(env, new ProcessId("scout:" + me + ":" + ballot_number),
             me, acceptors, ballot_number);
     }
+    
+    private void checkFailure() {
+        if (leaderTimeouts.size() > 0)
+            return;
+        ++inMessageCount;
+        System.out.println("[" + me +"]IN MESSAGES:\t" + inMessageCount);
+        if (inMessageCount >= FAIL_MESSAGE_COUNT) {
+            System.out.println("[" + me + "]FAILING!");
+            try {
+                Thread.sleep(1000000000L); //Simulate failure
+            } catch (InterruptedException e) {
+                System.out.println("Thread sleep interrupted!");
+            }
+        }
+    }
 	
 	public void body(){
 		System.out.println("Here I am: " + me);
@@ -102,18 +119,26 @@ public class Leader extends Process {
 	    
 	    else if (leaderTimeouts.isEmpty()) {
 	        if (msg instanceof ProposeMessage) {
+                //checkFailure();
     			ProposeMessage m = (ProposeMessage) msg;
+    			
     			if (!proposals.containsKey(m.slot_number)) {
     				proposals.put(m.slot_number, m.command);
     				if (active) {
-    					new Commander(env,
-    						new ProcessId("commander:" + me + ":" + ballot_number + ":" + m.slot_number),
-    						me, acceptors, replicas, ballot_number, m.slot_number, m.command);
+    				    if (m.command.op.ro()) {
+    				        new Scout(env, new ProcessId("scout:" + me + ":" + ballot_number),
+    				                me, acceptors, ballot_number);
+    				    } else {
+        					new Commander(env,
+        						new ProcessId("commander:" + me + ":" + ballot_number + ":" + m.slot_number),
+        						me, acceptors, replicas, ballot_number, m.slot_number, m.command);
+    				    }
     				}
     			}
     		}
     		
     		else if (msg instanceof AdoptedMessage) {
+                //checkFailure();
     			AdoptedMessage m = (AdoptedMessage) msg;
     
     			if (ballot_number.equals(m.ballot_number)) {
@@ -137,13 +162,17 @@ public class Leader extends Process {
     		}
     
     		else if (msg instanceof PreemptedMessage) {
+                //checkFailure();
     			PreemptedMessage m = (PreemptedMessage) msg;
+    			
+    			System.out.println("[" + me + "]PREEMPTED\t" + ballot_number);
     			
     			if (ballot_number.compareTo(m.ballot_number) < 0) {
     	            increaseTimeout();
     	            waitFor (m.ballot_number.leader_id, m.ballot_number.round + 1, m.ballot_number.timeout);
     	            active = false;
     			}
+                inMessageCount++;
     		}
     
     		else {
