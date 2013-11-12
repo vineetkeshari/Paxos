@@ -3,10 +3,11 @@ package paxos;
 import java.util.*;
 
 public class Leader extends Process {
-    final long BASE_TIMEOUT = 1000; // Milliseconds
-    long timeout = BASE_TIMEOUT;
+    final double BASE_TIMEOUT = 100; // Milliseconds
     final double TIMEOUT_MULT = 1.1;
     final double TIMEOUT_NEG = BASE_TIMEOUT/100.0;
+    
+    double timeout = BASE_TIMEOUT;
     
 	ProcessId[] acceptors;
 	ProcessId[] replicas;
@@ -14,7 +15,7 @@ public class Leader extends Process {
 	boolean active = false;
 	Map<Integer, Command> proposals = new HashMap<Integer, Command>();
 	
-	Map<ProcessId, Long> leaderTimeouts = new HashMap<ProcessId, Long>();
+	Map<ProcessId, Double> leaderTimeouts = new HashMap<ProcessId, Double>();
 	int next_round = 0;
 
 	public Leader(Env env, ProcessId me, ProcessId[] acceptors,
@@ -28,19 +29,22 @@ public class Leader extends Process {
 	}
 
 	private void increaseTimeout() {
-	    if (timeout <= 0)
+	    if (timeout <= 0.0)
 	        timeout = BASE_TIMEOUT;
 	    else
 	        timeout *= TIMEOUT_MULT;
+	    System.out.println("[" + me + "]TIMEOUT++\t" + timeout);	    
 	}
 	
 	private void decreaseTimeout() {
 	    timeout -=TIMEOUT_NEG;
+	    System.out.println("[" + me + "]TIMEOUT--\t" + timeout);
 	}
 	
-	private void waitFor (ProcessId otherLeader, int next_round, long ballot_timeout) {
+	private void waitFor (ProcessId otherLeader, int next_round, double ballot_timeout) {
         sendMessage (otherLeader, new PingMessage(me));
         leaderTimeouts.put(otherLeader, System.currentTimeMillis() + ballot_timeout);
+        //System.out.println("[" + me + "]WAITFOR\t" + leaderTimeouts.size());
         if (next_round > this.next_round) {
             this.next_round = next_round;
         }
@@ -55,7 +59,7 @@ public class Leader extends Process {
     
     private boolean timeout(ProcessId p) {
         if (System.currentTimeMillis() > leaderTimeouts.get(p)) {
-            leaderTimeouts.clear();
+            leaderTimeouts.remove(p);
             advanceBallot();
             return true;
         } else {

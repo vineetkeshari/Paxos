@@ -1,7 +1,7 @@
 package paxos;
 
 public abstract class Process extends Thread {
-    private static final long DELAY = 100; // Milliseconds
+    private static final long DELAY = 10; // Milliseconds
     
 	ProcessId me;
 	Queue<PaxosMessage> inbox = new Queue<PaxosMessage>();
