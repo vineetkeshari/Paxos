@@ -17,6 +17,10 @@ public class Command {
 		Command other = (Command) o;
 		return client.equals(other.client) && req_id == other.req_id && op.equals(other.op);
 	}
+	
+	public int hashCode() {
+	    return client.hashCode() + req_id + op.hashCode();
+	}
 
 	public String toString(){
 		return "Command(" + client + ", " + req_id + ", " + op + ")";

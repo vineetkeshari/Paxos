@@ -12,6 +12,10 @@ public class ProcessId implements Comparable {
 	public int compareTo(Object other){
 		return name.compareTo(((ProcessId) other).name);
 	}
+	
+	public int hashCode() {
+	    return name.hashCode();
+	}
 
 	public String toString(){ return name; }
 }

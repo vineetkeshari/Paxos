@@ -32,7 +32,7 @@ public class Acceptor extends Process {
 				if (ballot_number == null ||
 						ballot_number.compareTo(m.ballot_number) <= 0) {
 					ballot_number = m.ballot_number;
-					accepted.add(new PValue(ballot_number, m.slot_number, m.command));
+					addToAccepted(new PValue(ballot_number, m.slot_number, m.command));
 				}
 				sendMessage(m.src, new P2bMessage(me, ballot_number, m.slot_number));
 			}
@@ -42,9 +42,18 @@ public class Acceptor extends Process {
                 if (ballot_number == null ||
                         ballot_number.compareTo(m.ballot_number) <= 0) {
                     ballot_number = m.ballot_number;
-                    accepted.add(new PValue(ballot_number, m.slot_number, m.command));
+                    addToAccepted(new PValue(ballot_number, m.slot_number, m.command));
                 }
             }
 		}
+	}
+	
+	private void addToAccepted (PValue pval) {
+	    StringBuffer sb = new StringBuffer();
+	    accepted.add(pval);
+	    sb.append("[" + me + "]ACCEPTED: " + accepted.size() + "\n");
+	    for (PValue p : accepted)
+	        sb.append("\t" + p + "\n");
+	    //System.out.println(new String(sb));
 	}
 }

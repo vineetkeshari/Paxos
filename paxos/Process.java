@@ -19,7 +19,6 @@ public abstract class Process extends Thread {
 	}
 
 	void sendMessage(ProcessId dst, PaxosMessage msg){
-	    //System.out.println("[" + System.nanoTime() + "]\tSEND\t" + me + "\t" + dst + "\t" + msg);
 		env.sendMessage(dst, msg);
 		try {
 		    Thread.sleep(DELAY);

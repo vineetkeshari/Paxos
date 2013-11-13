@@ -22,6 +22,10 @@ public class BallotNumber implements Comparable {
 		}
 		return leader_id.compareTo(bn.leader_id);
 	}
+	
+	public int hashCode() {
+	    return round + leader_id.hashCode() + (int)timeout;
+	}
 
 	public String toString(){
 		return "BN(" + round + ", " + leader_id + ")";

@@ -5,10 +5,12 @@ import bank.BankState;
 public class ClientInquiryOperation extends Operation {
     
     int requestor;
+    boolean ro;
     
-    public ClientInquiryOperation(int requestor, String text) {
+    public ClientInquiryOperation(int requestor, String text, boolean ro) {
         super(text);
         this.requestor = requestor;
+        this.ro = ro;
     }
     
     public void perform (BankState bank) {
@@ -17,6 +19,9 @@ public class ClientInquiryOperation extends Operation {
     
     @Override
     public boolean ro() {
-        return true;
+        if (ro)
+            return true;
+        else
+            return false;
     }
 }

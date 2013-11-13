@@ -6,11 +6,13 @@ public class AccountInquiryOperation extends Operation {
     
     int requestor;
     int accountID;
+    boolean ro;
     
-    public AccountInquiryOperation(int requestor, int accountID, String text) {
+    public AccountInquiryOperation(int requestor, int accountID, String text, boolean ro) {
         super(text);
         this.requestor = requestor;
         this.accountID = accountID;
+        this.ro = ro;
     }
     
     public void perform (BankState bank) {
@@ -19,6 +21,9 @@ public class AccountInquiryOperation extends Operation {
     
     @Override
     public boolean ro() {
-        return true;
+        if (ro)
+            return true;
+        else
+            return false;
     }
 }

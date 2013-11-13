@@ -48,6 +48,11 @@ class DecisionMessage extends PaxosMessage {
 	public DecisionMessage(ProcessId src, int slot_number, Command command){
 		this.src = src; this.slot_number = slot_number; this.command = command;
 }	}
+class DecisionUpdateMessage extends PaxosMessage {
+    ProcessId src;
+    public DecisionUpdateMessage(ProcessId src){
+        this.src = src;
+}   }
 class RequestMessage extends PaxosMessage {
 	Command command;
 	public RequestMessage(ProcessId src, Command command){

@@ -10,11 +10,13 @@ import bank.operations.*;
 public class OperationReader {
     BufferedReader reader;
     boolean eof = true;
+    boolean ro;
     
-    public OperationReader (String filename) {
+    public OperationReader (String filename, boolean ro) {
         try {
             reader = new BufferedReader (new FileReader (filename));
             eof = false;
+            this.ro = ro;
         } catch (FileNotFoundException e) {
             System.out.println("File " + filename + " not found!");
         }
@@ -47,7 +49,7 @@ public class OperationReader {
             if (parts[0].equals("CREATE ACCOUNT")) {
                 nextOperation = new CreateAccountOperation(Integer.parseInt(parts[1]), line);
             } else if (parts[0].equals("INQUIRY")) {
-                nextOperation = new ClientInquiryOperation(Integer.parseInt(parts[1]), line);
+                nextOperation = new ClientInquiryOperation(Integer.parseInt(parts[1]), line, ro);
             }
         } else if (parts.length == 3) {
             if (parts[0].equals("CREATE CLIENT")) {
@@ -59,7 +61,7 @@ public class OperationReader {
             } else if (parts[0].equals("DEPOSIT")) {
                 nextOperation = new DepositOperation(Integer.parseInt(parts[1]), Double.parseDouble(parts[2]), line);
             } else if (parts[0].equals("INQUIRY")) {
-                nextOperation = new AccountInquiryOperation(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), line);
+                nextOperation = new AccountInquiryOperation(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), line, ro);
             }
         } else if (parts.length == 4) {
             if (parts[0].equals("WITHDRAW")) {

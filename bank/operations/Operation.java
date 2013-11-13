@@ -22,4 +22,8 @@ public abstract class Operation {
     public String toString() {
         return text;
     }
+    
+    public int hashCode() {
+        return text.hashCode();
+    }
 }

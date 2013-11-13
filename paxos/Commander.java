@@ -49,7 +49,7 @@ public class Commander extends Process {
     			}
     		}
 	    } else {
-	        System.out.println("[" + me + "]RO:\t" + command.op.text());
+	        //System.out.println("[" + me + "]RO:\t" + command.op.text());
 	        P2aROMessage m2 = new P2aROMessage(me, ballot_number, slot_number, command);
 	        for (ProcessId a: acceptors) {
 	            sendMessage(a, m2);
@@ -59,5 +59,6 @@ public class Commander extends Process {
 		for (ProcessId r: replicas) {
 			sendMessage(r, new DecisionMessage(me, slot_number, command));
 		}
+		sendMessage(leader, new DecisionUpdateMessage(me));
 	}
 }

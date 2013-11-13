@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Leader extends Process {    
     int inMessageCount = 0;
-    final int FAIL_MESSAGE_COUNT = 100; // No. of paxos messages received before failure
+    final int FAIL_MESSAGE_COUNT = 20; // No. of paxos messages received before failure
 
     final double BASE_TIMEOUT = 100; // Milliseconds
     final double TIMEOUT_MULT = 1.1;
@@ -35,12 +35,12 @@ public class Leader extends Process {
 	        timeout = BASE_TIMEOUT;
 	    else
 	        timeout *= TIMEOUT_MULT;
-	    System.out.println("[" + me + "]TIMEOUT++\t" + timeout);	    
+	    //System.out.println("[" + me + "]TIMEOUT++\t" + timeout);	    
 	}
 	
 	private void decreaseTimeout() {
 	    timeout -=TIMEOUT_NEG;
-	    System.out.println("[" + me + "]TIMEOUT--\t" + timeout);
+	    //System.out.println("[" + me + "]TIMEOUT--\t" + timeout);
 	}
 	
 	private void waitFor (ProcessId otherLeader, int next_round, double ballot_timeout) {
@@ -80,8 +80,8 @@ public class Leader extends Process {
     private void checkFailure() {
         if (leaderTimeouts.size() > 0)
             return;
-        ++inMessageCount;
-        System.out.println("[" + me +"]IN MESSAGES:\t" + inMessageCount);
+        //++inMessageCount;
+        //System.out.println("[" + me +"]IN MESSAGES:\t" + inMessageCount);
         if (inMessageCount >= FAIL_MESSAGE_COUNT) {
             System.out.println("[" + me + "]FAILING!");
             try {
@@ -119,7 +119,7 @@ public class Leader extends Process {
 	    
 	    else if (leaderTimeouts.isEmpty()) {
 	        if (msg instanceof ProposeMessage) {
-                //checkFailure();
+                checkFailure();
     			ProposeMessage m = (ProposeMessage) msg;
     			
     			if (!proposals.containsKey(m.slot_number)) {
@@ -138,11 +138,10 @@ public class Leader extends Process {
     		}
     		
     		else if (msg instanceof AdoptedMessage) {
-                //checkFailure();
+                checkFailure();
     			AdoptedMessage m = (AdoptedMessage) msg;
     
     			if (ballot_number.equals(m.ballot_number)) {
-    	            decreaseTimeout();
     				Map<Integer, BallotNumber> max = new HashMap<Integer, BallotNumber>();
     				for (PValue pv : m.accepted) {
     					BallotNumber bn = max.get(pv.slot_number);
@@ -162,18 +161,21 @@ public class Leader extends Process {
     		}
     
     		else if (msg instanceof PreemptedMessage) {
-                //checkFailure();
+                checkFailure();
     			PreemptedMessage m = (PreemptedMessage) msg;
+                increaseTimeout();
     			
-    			System.out.println("[" + me + "]PREEMPTED\t" + ballot_number);
+    			//System.out.println("[" + me + "]PREEMPTED\t" + ballot_number);
     			
     			if (ballot_number.compareTo(m.ballot_number) < 0) {
-    	            increaseTimeout();
     	            waitFor (m.ballot_number.leader_id, m.ballot_number.round + 1, m.ballot_number.timeout);
     	            active = false;
     			}
-                inMessageCount++;
     		}
+    
+            else if (msg instanceof DecisionUpdateMessage) {
+                decreaseTimeout();
+            }
     
     		else {
     			System.err.println("Leader: unknown msg type");
